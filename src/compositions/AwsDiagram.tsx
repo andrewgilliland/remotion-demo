@@ -1,8 +1,8 @@
 import { useCurrentFrame, useVideoConfig, interpolate, spring } from "remotion";
 
 // ── Layout constants ─────────────────────────────────────────────────────────
-const BOX_W = 136;
-const BOX_H = 52;
+const BOX_W = 148;
+const BOX_H = 56;
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 interface Service {
@@ -21,156 +21,144 @@ interface Conn {
   to: string;
   drawFrame: number;
   flowOffset: number;
+  label?: string;
 }
+
+//
+// Static website on S3 — left-to-right main path with supporting services
+//
+//                  ACM          OAC
+//                   ↓            ↓
+//  Users → Route 53 → CloudFront → S3
+//                         ↑
+//                        WAF
+//
+
+const CY = 360;
 
 const SERVICES: Service[] = [
   {
-    id: "internet",
-    label: "Internet",
-    sub: "Users",
-    abbr: "NET",
-    x: 80,
-    y: 300,
+    id: "users",
+    label: "Users",
+    sub: "Browser / Device",
+    abbr: "USR",
+    x: 90,
+    y: CY,
     color: "#6366f1",
     enterFrame: 10,
   },
   {
     id: "route53",
     label: "Route 53",
-    sub: "DNS",
+    sub: "DNS Lookup",
     abbr: "R53",
-    x: 285,
-    y: 195,
+    x: 310,
+    y: CY,
     color: "#a78bfa",
-    enterFrame: 22,
+    enterFrame: 28,
   },
   {
     id: "cloudfront",
     label: "CloudFront",
-    sub: "CDN",
+    sub: "CDN Distribution",
     abbr: "CF",
-    x: 285,
-    y: 405,
-    color: "#a78bfa",
-    enterFrame: 32,
+    x: 570,
+    y: CY,
+    color: "#fb923c",
+    enterFrame: 46,
+  },
+  {
+    id: "s3",
+    label: "S3 Bucket",
+    sub: "Static Files",
+    abbr: "S3",
+    x: 850,
+    y: CY,
+    color: "#4ade80",
+    enterFrame: 64,
+  },
+  {
+    id: "acm",
+    label: "ACM",
+    sub: "TLS Certificate",
+    abbr: "ACM",
+    x: 570,
+    y: CY - 190,
+    color: "#f87171",
+    enterFrame: 90,
   },
   {
     id: "waf",
     label: "WAF",
-    sub: "Shield",
+    sub: "Web Firewall",
     abbr: "WAF",
-    x: 490,
-    y: 195,
+    x: 570,
+    y: CY + 190,
     color: "#f87171",
-    enterFrame: 44,
+    enterFrame: 108,
   },
   {
-    id: "alb",
-    label: "Load Balancer",
-    sub: "ALB",
-    abbr: "ALB",
-    x: 490,
-    y: 405,
-    color: "#fb923c",
-    enterFrame: 56,
-  },
-  {
-    id: "ec2a",
-    label: "EC2",
-    sub: "App Server",
-    abbr: "EC2",
-    x: 700,
-    y: 155,
-    color: "#fb923c",
-    enterFrame: 68,
-  },
-  {
-    id: "ec2b",
-    label: "EC2",
-    sub: "App Server",
-    abbr: "EC2",
-    x: 700,
-    y: 315,
-    color: "#fb923c",
-    enterFrame: 76,
-  },
-  {
-    id: "ecs",
-    label: "ECS Fargate",
-    sub: "Containers",
-    abbr: "ECS",
-    x: 700,
-    y: 475,
-    color: "#fb923c",
-    enterFrame: 84,
-  },
-  {
-    id: "rds",
-    label: "RDS",
-    sub: "PostgreSQL",
-    abbr: "RDS",
-    x: 910,
-    y: 195,
+    id: "oac",
+    label: "Origin AC",
+    sub: "Access Control",
+    abbr: "OAC",
+    x: 850,
+    y: CY - 190,
     color: "#60a5fa",
-    enterFrame: 96,
-  },
-  {
-    id: "cache",
-    label: "ElastiCache",
-    sub: "Redis",
-    abbr: "E$",
-    x: 910,
-    y: 375,
-    color: "#f87171",
-    enterFrame: 106,
-  },
-  {
-    id: "s3",
-    label: "S3",
-    sub: "Object Store",
-    abbr: "S3",
-    x: 910,
-    y: 545,
-    color: "#4ade80",
-    enterFrame: 116,
-  },
-  {
-    id: "lambda",
-    label: "Lambda",
-    sub: "Serverless",
-    abbr: "λ",
-    x: 1130,
-    y: 285,
-    color: "#fb923c",
-    enterFrame: 128,
-  },
-  {
-    id: "sqs",
-    label: "SQS",
-    sub: "Queue",
-    abbr: "SQS",
-    x: 1130,
-    y: 455,
-    color: "#f472b6",
-    enterFrame: 138,
+    enterFrame: 126,
   },
 ];
 
 const CONNECTIONS: Conn[] = [
-  { from: "internet", to: "route53", drawFrame: 158, flowOffset: 0.0 },
-  { from: "internet", to: "cloudfront", drawFrame: 165, flowOffset: 0.33 },
-  { from: "route53", to: "waf", drawFrame: 172, flowOffset: 0.0 },
-  { from: "cloudfront", to: "alb", drawFrame: 179, flowOffset: 0.0 },
-  { from: "waf", to: "alb", drawFrame: 186, flowOffset: 0.5 },
-  { from: "alb", to: "ec2a", drawFrame: 193, flowOffset: 0.0 },
-  { from: "alb", to: "ec2b", drawFrame: 200, flowOffset: 0.33 },
-  { from: "alb", to: "ecs", drawFrame: 207, flowOffset: 0.66 },
-  { from: "ec2a", to: "rds", drawFrame: 214, flowOffset: 0.0 },
-  { from: "ec2b", to: "cache", drawFrame: 221, flowOffset: 0.0 },
-  { from: "ecs", to: "s3", drawFrame: 228, flowOffset: 0.0 },
-  { from: "s3", to: "lambda", drawFrame: 235, flowOffset: 0.0 },
-  { from: "lambda", to: "sqs", drawFrame: 242, flowOffset: 0.0 },
-  { from: "ec2a", to: "cache", drawFrame: 249, flowOffset: 0.5 },
+  {
+    from: "users",
+    to: "route53",
+    drawFrame: 150,
+    flowOffset: 0.0,
+    label: "DNS query",
+  },
+  {
+    from: "route53",
+    to: "cloudfront",
+    drawFrame: 166,
+    flowOffset: 0.25,
+    label: "CNAME alias",
+  },
+  {
+    from: "cloudfront",
+    to: "s3",
+    drawFrame: 182,
+    flowOffset: 0.5,
+    label: "Origin fetch",
+  },
+  {
+    from: "acm",
+    to: "cloudfront",
+    drawFrame: 200,
+    flowOffset: 0.0,
+    label: "TLS cert",
+  },
+  {
+    from: "waf",
+    to: "cloudfront",
+    drawFrame: 216,
+    flowOffset: 0.0,
+    label: "Rules",
+  },
+  {
+    from: "oac",
+    to: "cloudfront",
+    drawFrame: 232,
+    flowOffset: 0.0,
+    label: "Auth",
+  },
+  {
+    from: "oac",
+    to: "s3",
+    drawFrame: 248,
+    flowOffset: 0.5,
+    label: "Signed req",
+  },
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -178,11 +166,20 @@ function getSvc(id: string) {
   return SERVICES.find((s) => s.id === id)!;
 }
 
-function dist(x1: number, y1: number, x2: number, y2: number) {
-  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+// Returns the point on the box edge closest toward (tx, ty)
+function edgePoint(cx: number, cy: number, tx: number, ty: number) {
+  const dx = tx - cx;
+  const dy = ty - cy;
+  const d = Math.sqrt(dx * dx + dy * dy);
+  const ux = dx / d;
+  const uy = dy / d;
+  const tX = Math.abs(ux) > 1e-6 ? BOX_W / 2 / Math.abs(ux) : Infinity;
+  const tY = Math.abs(uy) > 1e-6 ? BOX_H / 2 / Math.abs(uy) : Infinity;
+  const t = Math.min(tX, tY);
+  return { x: cx + ux * t, y: cy + uy * t };
 }
 
-// Arrowhead pointing from (x1,y1) toward (x2,y2), tip offset from center
+// Arrowhead pointing from (x1,y1) toward (x2,y2), tip clipped to dest box edge
 function Arrowhead({
   x1,
   y1,
@@ -201,20 +198,14 @@ function Arrowhead({
   const d = Math.sqrt(dx * dx + dy * dy);
   const ux = dx / d;
   const uy = dy / d;
-  // Place tip at edge of destination box
-  const tipX = x2 - ux * (BOX_W / 2 + 2);
-  const tipY = y2 - uy * (BOX_H / 2 + 2);
+  const tip = edgePoint(x2, y2, x1, y1);
   const len = 9;
   const wing = 5;
   return (
     <polygon
-      points={`
-        ${tipX},${tipY}
-        ${tipX - len * ux + wing * -uy},${tipY - len * uy + wing * ux}
-        ${tipX - len * ux - wing * -uy},${tipY - len * uy - wing * ux}
-      `}
+      points={`${tip.x},${tip.y} ${tip.x - len * ux + wing * -uy},${tip.y - len * uy + wing * ux} ${tip.x - len * ux - wing * -uy},${tip.y - len * uy - wing * ux}`}
       fill={color}
-      fillOpacity={0.55}
+      fillOpacity={0.6}
     />
   );
 }
@@ -224,18 +215,18 @@ export const AwsDiagram = () => {
   const frame = useCurrentFrame();
   const { width, height, fps } = useVideoConfig();
 
-  const FLOW_PERIOD = 52;
-  const FLOW_START = 158 + 18; // first connection done
+  const FLOW_PERIOD = 55;
+  const FLOW_START = 266; // after last connection is drawn
 
-  const bgOpacity = interpolate(frame, [0, 18], [0, 1], {
+  const bgOpacity = interpolate(frame, [0, 20], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const vpcOpacity = interpolate(frame, [8, 28], [0, 1], {
+  const cloudBoundaryOpacity = interpolate(frame, [8, 28], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const legendOpacity = interpolate(frame, [148, 168], [0, 1], {
+  const legendOpacity = interpolate(frame, [256, 276], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -257,7 +248,6 @@ export const AwsDiagram = () => {
         style={{ position: "absolute", inset: 0 }}
       >
         <defs>
-          {/* Clippath for each service box (defined per box below) */}
           {SERVICES.map((svc) => (
             <clipPath key={`clip-${svc.id}`} id={`clip-${svc.id}`}>
               <rect
@@ -271,62 +261,39 @@ export const AwsDiagram = () => {
           ))}
         </defs>
 
-        {/* ── VPC boundary ──────────────────────────────────────────────── */}
+        {/* ── AWS Cloud boundary ────────────────────────────────────────── */}
         <rect
-          x={618}
+          x={220}
           y={90}
-          width={620}
-          height={580}
+          width={720}
+          height={540}
           rx={14}
-          fill="rgba(37,99,235,0.04)"
-          stroke="rgba(59,130,246,0.22)"
+          fill="rgba(37,99,235,0.03)"
+          stroke="rgba(99,130,246,0.18)"
           strokeWidth={1.5}
-          strokeDasharray="9 5"
-          opacity={vpcOpacity}
+          strokeDasharray="10 5"
+          opacity={cloudBoundaryOpacity}
         />
         <text
-          x={634}
-          y={111}
-          fill="rgba(96,165,250,0.55)"
+          x={238}
+          y={112}
+          fill="rgba(148,163,184,0.38)"
           fontSize={11}
           fontWeight="600"
-          opacity={vpcOpacity}
+          opacity={cloudBoundaryOpacity}
         >
-          VPC — us-east-1
+          AWS Cloud
         </text>
-
-        {/* AZ divider lines inside VPC */}
-        {[252, 412].map((y) => (
-          <line
-            key={y}
-            x1={628}
-            y1={y}
-            x2={1228}
-            y2={y}
-            stroke="rgba(255,255,255,0.05)"
-            strokeWidth={1}
-            strokeDasharray="5 7"
-            opacity={vpcOpacity}
-          />
-        ))}
-        {["AZ-1", "AZ-2", "AZ-3"].map((label, i) => (
-          <text
-            key={label}
-            x={634}
-            y={[145, 305, 465][i]}
-            fill="rgba(255,255,255,0.08)"
-            fontSize={10}
-            opacity={vpcOpacity}
-          >
-            {label}
-          </text>
-        ))}
 
         {/* ── Connection lines ──────────────────────────────────────────── */}
         {CONNECTIONS.map((conn) => {
           const a = getSvc(conn.from);
           const b = getSvc(conn.to);
-          const length = dist(a.x, a.y, b.x, b.y);
+          const p1 = edgePoint(a.x, a.y, b.x, b.y);
+          const p2 = edgePoint(b.x, b.y, a.x, a.y);
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const length = Math.sqrt(dx * dx + dy * dy);
 
           const drawProgress = interpolate(
             frame,
@@ -335,9 +302,12 @@ export const AwsDiagram = () => {
             { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
           );
           const drawn = drawProgress >= 0.98;
-          const flowActive = frame >= conn.drawFrame + 16;
+          const flowActive = frame >= FLOW_START;
 
-          // 3 evenly-spaced flow dots
+          const isVertical = Math.abs(dy) > Math.abs(dx);
+          const midX = (p1.x + p2.x) / 2;
+          const midY = (p1.y + p2.y) / 2;
+
           const dots = flowActive
             ? Array.from({ length: 3 }).map((_, di) => {
                 const t =
@@ -348,9 +318,9 @@ export const AwsDiagram = () => {
                     1) %
                   1;
                 return {
-                  x: a.x + (b.x - a.x) * t,
-                  y: a.y + (b.y - a.y) * t,
-                  opacity: 0.85 - t * 0.4,
+                  x: p1.x + (p2.x - p1.x) * t,
+                  y: p1.y + (p2.y - p1.y) * t,
+                  opacity: 0.9 - t * 0.5,
                 };
               })
             : [];
@@ -358,18 +328,37 @@ export const AwsDiagram = () => {
           return (
             <g key={`${conn.from}→${conn.to}`}>
               <line
-                x1={a.x}
-                y1={a.y}
-                x2={b.x}
-                y2={b.y}
-                stroke="rgba(255,255,255,0.14)"
+                x1={p1.x}
+                y1={p1.y}
+                x2={p2.x}
+                y2={p2.y}
+                stroke="rgba(255,255,255,0.15)"
                 strokeWidth={1.5}
                 strokeLinecap="round"
                 strokeDasharray={length}
                 strokeDashoffset={length * (1 - drawProgress)}
               />
               {drawn && (
-                <Arrowhead x1={a.x} y1={a.y} x2={b.x} y2={b.y} color="white" />
+                <>
+                  <Arrowhead
+                    x1={a.x}
+                    y1={a.y}
+                    x2={b.x}
+                    y2={b.y}
+                    color="white"
+                  />
+                  {conn.label && (
+                    <text
+                      x={midX + (isVertical ? 26 : 0)}
+                      y={midY + (isVertical ? 0 : -9)}
+                      textAnchor="middle"
+                      fill="rgba(255,255,255,0.28)"
+                      fontSize={10}
+                    >
+                      {conn.label}
+                    </text>
+                  )}
+                </>
               )}
               {dots.map((dot, di) => (
                 <circle
@@ -390,9 +379,9 @@ export const AwsDiagram = () => {
           const s = spring({
             fps,
             frame: Math.max(0, frame - svc.enterFrame),
-            config: { damping: 16, stiffness: 160, mass: 0.6 },
+            config: { damping: 15, stiffness: 150, mass: 0.6 },
           });
-          const opacity = Math.min(1, s * 1.8);
+          const opacity = Math.min(1, s * 2);
           const bx = svc.x - BOX_W / 2;
           const by = svc.y - BOX_H / 2;
 
@@ -427,47 +416,47 @@ export const AwsDiagram = () => {
               <rect
                 x={bx}
                 y={by}
-                width={7}
+                width={8}
                 height={BOX_H}
                 fill={svc.color}
-                fillOpacity={0.9}
+                fillOpacity={0.85}
                 clipPath={`url(#clip-${svc.id})`}
               />
               {/* Abbr badge */}
               <rect
                 x={bx + 14}
-                y={svc.y - 12}
-                width={24}
-                height={24}
+                y={svc.y - 13}
+                width={26}
+                height={26}
                 rx={5}
                 fill={svc.color}
-                fillOpacity={0.18}
+                fillOpacity={0.15}
               />
               <text
-                x={bx + 26}
-                y={svc.y + 5}
+                x={bx + 27}
+                y={svc.y + 5.5}
                 textAnchor="middle"
                 fill={svc.color}
-                fontSize={svc.abbr.length <= 2 ? 11 : 9}
+                fontSize={svc.abbr.length <= 2 ? 12 : 9}
                 fontWeight="800"
               >
                 {svc.abbr}
               </text>
               {/* Service name */}
               <text
-                x={bx + 46}
+                x={bx + 48}
                 y={svc.y - 3}
                 fill="rgba(255,255,255,0.88)"
-                fontSize={12}
+                fontSize={13}
                 fontWeight="600"
               >
                 {svc.label}
               </text>
               {/* Sub label */}
               <text
-                x={bx + 46}
-                y={svc.y + 13}
-                fill="rgba(255,255,255,0.38)"
+                x={bx + 48}
+                y={svc.y + 14}
+                fill="rgba(255,255,255,0.36)"
                 fontSize={10}
               >
                 {svc.sub}
@@ -494,7 +483,7 @@ export const AwsDiagram = () => {
             letterSpacing: -0.5,
           }}
         >
-          AWS Infrastructure
+          Static Website Hosting
         </div>
         <div
           style={{
@@ -504,7 +493,7 @@ export const AwsDiagram = () => {
             letterSpacing: 0.3,
           }}
         >
-          Production Architecture · us-east-1
+          S3 + CloudFront + Route 53
         </div>
       </div>
 
@@ -521,12 +510,12 @@ export const AwsDiagram = () => {
         }}
       >
         {[
+          { color: "#6366f1", label: "Users" },
           { color: "#a78bfa", label: "Networking" },
-          { color: "#f87171", label: "Security / Cache" },
-          { color: "#fb923c", label: "Compute" },
-          { color: "#60a5fa", label: "Database" },
+          { color: "#fb923c", label: "CDN" },
+          { color: "#f87171", label: "Security" },
           { color: "#4ade80", label: "Storage" },
-          { color: "#f472b6", label: "Messaging" },
+          { color: "#60a5fa", label: "Access Control" },
         ].map(({ color, label }) => (
           <div
             key={label}

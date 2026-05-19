@@ -14,6 +14,7 @@ import { MusicVisualizer } from "./compositions/MusicVisualizer";
 import { FakeTerminal } from "./compositions/FakeTerminal";
 import { CartoonRobot } from "./compositions/CartoonRobot";
 import { AwsDiagram } from "./compositions/AwsDiagram";
+import { AwsInfraDiagram } from "./compositions/AwsInfraDiagram";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -125,6 +126,14 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="AwsDiagram"
         component={AwsDiagram}
+        durationInFrames={330}
+        fps={60}
+        width={1280}
+        height={720}
+      />
+      <Composition
+        id="AwsInfraDiagram"
+        component={AwsInfraDiagram}
         durationInFrames={360}
         fps={60}
         width={1280}
