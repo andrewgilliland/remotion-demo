@@ -93,7 +93,13 @@ export const AnimatedResume = () => {
         <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 2 }}>
           Andrew Gilliland
         </div>
-        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, marginBottom: 36 }}>
+        <div
+          style={{
+            color: "rgba(255,255,255,0.5)",
+            fontSize: 13,
+            marginBottom: 36,
+          }}
+        >
           Software Engineer
         </div>
 
@@ -111,10 +117,15 @@ export const AnimatedResume = () => {
 
         {SKILLS.map((skill, i) => {
           const start = 42 + i * 12;
-          const barW = interpolate(frame, [start, start + 30], [0, skill.level], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          });
+          const barW = interpolate(
+            frame,
+            [start, start + 30],
+            [0, skill.level],
+            {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            },
+          );
           const opacity = interpolate(frame, [start, start + 15], [0, 1], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
@@ -167,7 +178,12 @@ export const AnimatedResume = () => {
         }}
       >
         <div
-          style={{ fontSize: 26, fontWeight: 800, color: "#1e293b", marginBottom: 6 }}
+          style={{
+            fontSize: 26,
+            fontWeight: 800,
+            color: "#1e293b",
+            marginBottom: 6,
+          }}
         >
           Experience
         </div>
@@ -212,12 +228,23 @@ export const AnimatedResume = () => {
                   marginBottom: 2,
                 }}
               >
-                <div style={{ fontSize: 18, fontWeight: 700, color: "#1e293b" }}>
+                <div
+                  style={{ fontSize: 18, fontWeight: 700, color: "#1e293b" }}
+                >
                   {job.title}
                 </div>
-                <div style={{ fontSize: 13, color: "#94a3b8" }}>{job.years}</div>
+                <div style={{ fontSize: 13, color: "#94a3b8" }}>
+                  {job.years}
+                </div>
               </div>
-              <div style={{ fontSize: 13, color: "#7c3aed", fontWeight: 600, marginBottom: 6 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "#7c3aed",
+                  fontWeight: 600,
+                  marginBottom: 6,
+                }}
+              >
                 {job.company}
               </div>
               <div style={{ fontSize: 14, color: "#64748b", lineHeight: 1.5 }}>

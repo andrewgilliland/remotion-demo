@@ -82,7 +82,12 @@ export const CodeTypewriter = () => {
           {["#f38ba8", "#fab387", "#a6e3a1"].map((c, i) => (
             <div
               key={i}
-              style={{ width: 13, height: 13, borderRadius: "50%", background: c }}
+              style={{
+                width: 13,
+                height: 13,
+                borderRadius: "50%",
+                background: c,
+              }}
             />
           ))}
           <span
@@ -104,7 +109,11 @@ export const CodeTypewriter = () => {
             return (
               <div
                 key={i}
-                style={{ lineHeight: "1.75", fontSize: 17, minHeight: "1.75em" }}
+                style={{
+                  lineHeight: "1.75",
+                  fontSize: 17,
+                  minHeight: "1.75em",
+                }}
               >
                 <span style={{ color: COLORS[line.type] }}>{line.visible}</span>
                 {i === cursorIdx && showCursor && (

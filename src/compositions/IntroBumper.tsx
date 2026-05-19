@@ -43,7 +43,11 @@ export const IntroBumper = () => {
       }}
     >
       {/* Rotating rings */}
-      <svg style={{ position: "absolute", inset: 0 }} width={width} height={height}>
+      <svg
+        style={{ position: "absolute", inset: 0 }}
+        width={width}
+        height={height}
+      >
         {[220, 310, 400].map((r, i) => {
           const dir = i % 2 === 0 ? 1 : -1;
           return (
@@ -64,7 +68,8 @@ export const IntroBumper = () => {
         {/* Particle dots on orbit */}
         {[220, 310].map((r, ri) =>
           [0, 120, 240].map((deg, di) => {
-            const angle = ((deg + ringAngle * (ri === 0 ? 1 : -1)) * Math.PI) / 180;
+            const angle =
+              ((deg + ringAngle * (ri === 0 ? 1 : -1)) * Math.PI) / 180;
             const cx = width / 2 + Math.cos(angle) * r;
             const cy = height / 2 + Math.sin(angle) * r;
             return (
@@ -93,7 +98,8 @@ export const IntroBumper = () => {
           alignItems: "center",
           justifyContent: "center",
           fontSize: 44,
-          boxShadow: "0 0 50px rgba(124,58,237,0.5), 0 0 120px rgba(124,58,237,0.2)",
+          boxShadow:
+            "0 0 50px rgba(124,58,237,0.5), 0 0 120px rgba(124,58,237,0.2)",
         }}
       >
         ⚡
@@ -118,7 +124,8 @@ export const IntroBumper = () => {
         style={{
           width: 220,
           height: 2,
-          background: "linear-gradient(90deg, transparent, #7c3aed, transparent)",
+          background:
+            "linear-gradient(90deg, transparent, #7c3aed, transparent)",
           margin: "18px 0",
           transform: `scaleX(${lineScale})`,
           transformOrigin: "center",

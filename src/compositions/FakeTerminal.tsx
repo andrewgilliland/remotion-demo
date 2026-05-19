@@ -46,7 +46,10 @@ export const FakeTerminal = () => {
   });
 
   const showCursor = Math.floor(frame / 18) % 2 === 0;
-  const lastActive = lines.reduce((last, l, i) => (l.visible.length > 0 ? i : last), 0);
+  const lastActive = lines.reduce(
+    (last, l, i) => (l.visible.length > 0 ? i : last),
+    0,
+  );
 
   return (
     <div
@@ -66,7 +69,8 @@ export const FakeTerminal = () => {
           background: "#141420",
           borderRadius: 14,
           overflow: "hidden",
-          boxShadow: "0 30px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)",
+          boxShadow:
+            "0 30px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)",
         }}
       >
         {/* Title bar */}
@@ -82,10 +86,21 @@ export const FakeTerminal = () => {
           {["#f38ba8", "#fab387", "#a6e3a1"].map((c, i) => (
             <div
               key={i}
-              style={{ width: 13, height: 13, borderRadius: "50%", background: c }}
+              style={{
+                width: 13,
+                height: 13,
+                borderRadius: "50%",
+                background: c,
+              }}
             />
           ))}
-          <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, marginLeft: 10 }}>
+          <span
+            style={{
+              color: "rgba(255,255,255,0.3)",
+              fontSize: 13,
+              marginLeft: 10,
+            }}
+          >
             zsh — remotion-demo
           </span>
         </div>
@@ -98,7 +113,11 @@ export const FakeTerminal = () => {
             return (
               <div
                 key={i}
-                style={{ lineHeight: "1.85", fontSize: 15, minHeight: "1.85em" }}
+                style={{
+                  lineHeight: "1.85",
+                  fontSize: 15,
+                  minHeight: "1.85em",
+                }}
               >
                 <span style={{ color: lineColor(line) }}>{line.visible}</span>
                 {isLastActive && showCursor && (

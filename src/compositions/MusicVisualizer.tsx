@@ -105,7 +105,13 @@ export const MusicVisualizer = () => {
           gap: 6,
         }}
       >
-        <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 18, fontWeight: 600 }}>
+        <div
+          style={{
+            color: "rgba(255,255,255,0.7)",
+            fontSize: 18,
+            fontWeight: 600,
+          }}
+        >
           Generative Waves
         </div>
         <div

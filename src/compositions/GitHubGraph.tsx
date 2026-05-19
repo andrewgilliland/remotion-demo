@@ -56,17 +56,35 @@ export const GitHubGraph = () => {
             const index = week * DAYS + day;
             const rand = seededRandom(index);
             const activity =
-              rand < 0.3 ? 0 : rand < 0.5 ? 1 : rand < 0.7 ? 2 : rand < 0.9 ? 3 : 4;
+              rand < 0.3
+                ? 0
+                : rand < 0.5
+                  ? 1
+                  : rand < 0.7
+                    ? 2
+                    : rand < 0.9
+                      ? 3
+                      : 4;
 
             const revealFrame = (index / TOTAL) * 80;
-            const opacity = interpolate(frame, [revealFrame, revealFrame + 10], [0, 1], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
-            });
-            const scale = interpolate(frame, [revealFrame, revealFrame + 10], [0.2, 1], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
-            });
+            const opacity = interpolate(
+              frame,
+              [revealFrame, revealFrame + 10],
+              [0, 1],
+              {
+                extrapolateLeft: "clamp",
+                extrapolateRight: "clamp",
+              },
+            );
+            const scale = interpolate(
+              frame,
+              [revealFrame, revealFrame + 10],
+              [0.2, 1],
+              {
+                extrapolateLeft: "clamp",
+                extrapolateRight: "clamp",
+              },
+            );
 
             const cx = week * (CELL + GAP) + CELL / 2;
             const cy = day * (CELL + GAP) + CELL / 2;
@@ -104,7 +122,12 @@ export const GitHubGraph = () => {
         {LEVELS.map((color, i) => (
           <div
             key={i}
-            style={{ width: CELL, height: CELL, borderRadius: 4, background: color }}
+            style={{
+              width: CELL,
+              height: CELL,
+              borderRadius: 4,
+              background: color,
+            }}
           />
         ))}
         <span style={{ color: "#8b949e", fontSize: 13 }}>More</span>

@@ -53,7 +53,14 @@ export const YearInReview = () => {
         >
           Annual Summary
         </div>
-        <div style={{ color: "white", fontSize: 52, fontWeight: 900, letterSpacing: -1 }}>
+        <div
+          style={{
+            color: "white",
+            fontSize: 52,
+            fontWeight: 900,
+            letterSpacing: -1,
+          }}
+        >
           2025 Year in Review
         </div>
       </div>

@@ -73,7 +73,11 @@ export const BarChartRace = () => {
 
   const currentData = fromStage.data.map((item, i) => ({
     name: item.name,
-    value: interpolate(stageProgress, [0, 1], [item.value, toStage.data[i].value]),
+    value: interpolate(
+      stageProgress,
+      [0, 1],
+      [item.value, toStage.data[i].value],
+    ),
   }));
 
   const sorted = [...currentData].sort((a, b) => b.value - a.value);

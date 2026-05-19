@@ -16,10 +16,15 @@ export const LowerThirds = () => {
   });
 
   // Slide out
-  const slideOut = interpolate(frame, [HOLD_UNTIL, HOLD_UNTIL + 20], [0, -400], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const slideOut = interpolate(
+    frame,
+    [HOLD_UNTIL, HOLD_UNTIL + 20],
+    [0, -400],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    },
+  );
 
   const x = frame < HOLD_UNTIL ? slideIn : slideOut;
 
@@ -48,7 +53,11 @@ export const LowerThirds = () => {
       }}
     >
       {/* Subtle background texture */}
-      <svg style={{ position: "absolute", inset: 0, opacity: 0.03 }} width={width} height={height}>
+      <svg
+        style={{ position: "absolute", inset: 0, opacity: 0.03 }}
+        width={width}
+        height={height}
+      >
         {Array.from({ length: 20 }).map((_, i) => (
           <line
             key={i}
