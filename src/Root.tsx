@@ -12,6 +12,7 @@ import { YearInReview } from "./compositions/YearInReview";
 import { IntroBumper } from "./compositions/IntroBumper";
 import { MusicVisualizer } from "./compositions/MusicVisualizer";
 import { FakeTerminal } from "./compositions/FakeTerminal";
+import { CartoonRobot } from "./compositions/CartoonRobot";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -108,6 +109,14 @@ export const RemotionRoot: React.FC = () => {
         id="FakeTerminal"
         component={FakeTerminal}
         durationInFrames={320}
+        fps={60}
+        width={1280}
+        height={720}
+      />
+      <Composition
+        id="CartoonRobot"
+        component={CartoonRobot}
+        durationInFrames={300}
         fps={60}
         width={1280}
         height={720}
